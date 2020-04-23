@@ -2,7 +2,7 @@
 #include "rom/ets_sys.h"
 
 #define PI 3.1415926535
-
+#define PI2 6.283185307
 
 // サイン波形テーブル 0 - 2PI 1000点(最後1点だけは、アドレス計算でオーバーフローしないようにダミーで追加)
 // MacのC言語で吐き出す
@@ -130,14 +130,14 @@ static float lerp(float x0, float y0, float x1, float y1, float x) {
 // サイン波形をテーブルから参照する
 float calc_sin(uint32_t helz)
 {
-    float T = 1000. * 1000. / (float)helz;
+    float T = 1000000. / (float)helz;
 
     float TT = esp_timer_get_time() / T;
     float TT_shosu = TT - (int)TT;
 
-    float R = 2 * PI * TT_shosu;
+    float R = PI2 * TT_shosu;
 
-    float addr_f = R * 1000. / (2. * PI);
+    float addr_f = R * 1000. / (PI2);
     int addr = (int)addr_f;
     float shosuR = addr_f - (int)addr;
     int addr1 = addr + 1;
@@ -163,17 +163,17 @@ float calc_sin(uint32_t helz)
 // サイン波形をテーブルから参照する
 float calc_sin_float(float helz, float mod, uint64_t now_time_in_us)
 {
-    float T = 1000. * 1000. / helz;
+    float T = 1000000. / helz;      // 1000 * 1000 / helz
 
-    float TT = esp_timer_get_time() / T;
+    float TT = now_time_in_us / T;
     float TT_shosu = TT - (int)TT;
 
-    float R = 2 * PI * TT_shosu;
+    float R = PI2 * TT_shosu;       // 2 * PI * TT_shosu
     R = R + mod;
     //サイン対称性により + へ移行させる
-    if(R < 0.0) R += 2 * PI;
+    if(R < 0.0) R += PI2;
 
-    float addr_f = R * 1000. / ((2. * PI));
+    float addr_f = R * 1000. / ((PI2)); //R * 1000. / ((2 * PI));
     int addr = (int)addr_f;
     if(addr >= 1000) {
         do {
