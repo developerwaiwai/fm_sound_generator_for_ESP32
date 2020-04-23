@@ -170,12 +170,16 @@ float calc_sin_float(float helz, float mod, uint64_t now_time_in_us)
 
     float R = 2 * PI * TT_shosu;
     R = R + mod;
-    //サイン対称性により + へ以降させる
-    if(R < 0.0) R = -R;
+    //サイン対称性により + へ移行させる
+    if(R < 0.0) R += 2 * PI;
 
     float addr_f = R * 1000. / ((2. * PI));
     int addr = (int)addr_f;
-    if(addr >= 1000) addr = 999;    //念の為 高速化のためなくてもいいかも
+    if(addr >= 1000) {
+        do {
+            addr -= 1000;
+        } while(addr >= 1000);
+    }
     if(addr < 0) addr = 0;          //念の為 高速化のためなくてもいいかも
 
     float shosuR = addr_f - (int)addr;
