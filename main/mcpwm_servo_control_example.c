@@ -9,7 +9,6 @@
 #define eighth_note 250000
 
 
-
 void note_4algorism(algolism_4op algorism, bool note_on, uint16_t tempo, uint64_t note, struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4)
 {
     uint64_t note_length = note * tempo / defaultTempo;
@@ -33,7 +32,7 @@ void note(algorism algor, bool note_on, uint16_t helz, uint16_t tempo, uint64_t 
 void clear_param(struct algorism_param_4op *param1){
 
     param1->internal.atack_start_time = param1->internal.decay_start_time = param1->internal.release_start_time = 0;
-    param1->attack = 100; param1->decay = 1300000; param1->sustain_level = 0.3;
+    param1->attack = 0; param1->decay = 1500000; param1->sustain_level = 0.1;
     param1->amp = 1.0;
 
 }
@@ -55,9 +54,9 @@ void onkai(void* arg)
         param4.amp = 1.0;
 
         param1.helz_mul = 1;
-        param2.helz_mul = 3;
+        param2.helz_mul = 2;
         param3.helz_mul = 3;
-        param4.helz_mul = 1;
+        param4.helz_mul = 4;
 
         algolism_4op algorism_[8];
         algorism_[0] = YM2203_algolism0;
@@ -168,6 +167,7 @@ static xQueueHandle command_queue = NULL;
 
 void app_main(void)
 {
+
     mcpwm_sound_soure_init();
     xTaskCreate(onkai, "onkai", 4096, NULL, 5, NULL);
 

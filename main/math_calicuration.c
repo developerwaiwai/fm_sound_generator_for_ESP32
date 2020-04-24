@@ -6,6 +6,8 @@
 
 // サイン波形テーブル 0 - 2PI 1000点(最後1点だけは、アドレス計算でオーバーフローしないようにダミーで追加)
 // MacのC言語で吐き出す
+#define SAMPLE_NUM_F 1000.
+#define SAMPLE_NUM_I 1000
 static float sin_table[1001] = {
     0.000000, 0.006283, 0.012566, 0.018848, 0.025130, 0.031411, 0.037690, 0.043968, 0.050244, 0.056519,
     0.062791, 0.069060, 0.075327, 0.081591, 0.087851, 0.094108, 0.100362, 0.106611, 0.112856, 0.119097,
@@ -112,7 +114,8 @@ static float sin_table[1001] = {
 
 //線形補完処理
 static float lerp(float x0, float y0, float x1, float y1, float x) {
-  return -y0 + y0 + (y1 - y0) * (x - x0) / (x1 - x0) ;
+    // return -y0 + y0 + (y1 - y0) * (x - x0) / (x1 - x0) ;
+    return (y1 - y0) * (x - x0) / (x1 - x0) ;
 }
 
 
@@ -137,12 +140,12 @@ float calc_sin(uint32_t helz)
 
     float R = PI2 * TT_shosu;
 
-    float addr_f = R * 1000. / (PI2);
+    float addr_f = R * SAMPLE_NUM_F / (PI2);
     int addr = (int)addr_f;
-    float shosuR = addr_f - (int)addr;
+    float shosuAddr = addr_f - (int)addr;
     int addr1 = addr + 1;
 
-    float hokan = lerp(0, sin_table[addr], 1, sin_table[addr1], shosuR);
+    float hokan = lerp(0, sin_table[addr], 1, sin_table[addr1], shosuAddr);
     // printf("%f\n", hokan);
     return sin_table[addr] + hokan;
     // return sin_table[addr] + hokan;
@@ -173,20 +176,16 @@ float calc_sin_float(float helz, float mod, uint64_t now_time_in_us)
     //サイン対称性により + へ移行させる
     if(R < 0.0) R += PI2;
 
-    float addr_f = R * 1000. / ((PI2)); //R * 1000. / ((2 * PI));
+    float addr_f = R * SAMPLE_NUM_F / PI2; //R * 1000. / ((2 * PI));
     int addr = (int)addr_f;
-    if(addr >= 1000) {
-        do {
-            addr -= 1000;
-        } while(addr >= 1000);
-    }
+    if(addr >= SAMPLE_NUM_I) addr %= SAMPLE_NUM_I;
     if(addr < 0) addr = 0;          //念の為 高速化のためなくてもいいかも
 
-    float shosuR = addr_f - (int)addr;
+    float shosuAddr = addr_f - (int)addr;
     int addr1 = addr + 1;
 
     //引数 x0,x1は結局1の絶対値が必要なだけだから0,1とする
-    float hokan = lerp(0, sin_table[addr], 1, sin_table[addr1], shosuR);
+    float hokan = lerp(0, sin_table[addr], 1, sin_table[addr1], shosuAddr);
 
     return sin_table[addr] + hokan;
 }

@@ -12,17 +12,21 @@ float envelope(struct algorism_param_4op *param1, uint64_t t){
 
     if(param1->internal.atack_start_time == 0) {
         param1->internal.atack_start_time = t;
-        amp1 = 0.;
+        amp1 = param1->attack ? 0. : 1.;
     }
     else {
-        amp1 = ((float)(1. / (float)param1->attack) * (float)(t - param1->internal.atack_start_time));
+        if(param1->attack != 0) {
+            amp1 = ((float)(1. / (float)param1->attack) * (float)(t - param1->internal.atack_start_time));
+        }
         if (amp1 >= 1.) {
             if(param1->internal.decay_start_time == 0) {
                 param1->internal.decay_start_time = t;
-                amp1 = 1.;
+                amp1 = param1->decay ? 1. : param1->sustain_level;
             }
             else {
-                amp1 = (1. - (float)((float)(1. / (float)param1->decay) * (float)(t - param1->internal.decay_start_time)));
+                if(param1->decay != 0) {
+                    amp1 = (1. - (float)((float)(1. / (float)param1->decay) * (float)(t - param1->internal.decay_start_time)));
+                }
                 if (amp1 <= param1->sustain_level) {
                     amp1 = param1->sustain_level;
                 }
@@ -30,6 +34,7 @@ float envelope(struct algorism_param_4op *param1, uint64_t t){
         }
     }
 
+    // for test
     // printf("%f", amp1);
     return amp1;
 }
@@ -53,8 +58,10 @@ float YM2203_algolism0(struct algorism_param_4op *param1, struct algorism_param_
     float Y1 = amp1 * calc_sin_float((float)helz1, 0, t);
     float Y = amp4 * calc_sin_float((float)main_helz , amp3 * calc_sin_float((float)helz3, amp2 * calc_sin_float((float)helz2 , amp1 * calc_sin_float((float)helz1 ,Y1, t), t), t), t);
 
+    // for test
     // float Y = param4->amp * calc_sin_float((float)helz4, param2->amp * calc_sin_float((float)helz2, 0, t), t);
 
+    // for test
     // uint64_t t2 = esp_timer_get_time();
     // printf("%lld\n", t2-t);
     Y = (Y + param4->amp) / (param4->amp*2);
