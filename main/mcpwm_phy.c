@@ -1,4 +1,31 @@
 #include "fm_algorism.h"
+#include <string.h>
+
+struct note_param {
+    algolism_4op playing_algorism;
+    struct algorism_param_4op param1, param2, param3, param4;
+
+    bool        note_on_off;
+    uint64_t    note_length;
+
+    uint64_t    start;
+    bool        start_flag;
+};
+
+volatile struct note_param param_g;
+
+
+typedef struct {
+    int type;  // the type of timer's event
+    int timer_group;
+    int timer_idx;
+    uint64_t timer_counter_value;
+} timer_event_t;
+
+xQueueHandle timer_queue;
+
+
+void fm_algorism_timer_init();
 
 
 void mcpwm_sound_soure_init()
@@ -16,7 +43,104 @@ void mcpwm_sound_soure_init()
     pwm_config.duty_mode = MCPWM_DUTY_MODE_0;
     mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config);    //Configure PWM0A & PWM0B with above settings
 
+    fm_algorism_timer_init();
 }
+
+
+void IRAM_ATTR timer_group0_isr(void *para)
+{
+    timer_spinlock_take(TIMER_GROUP_0);
+    int timer_idx = (int) para;
+
+    uint32_t timer_intr = timer_group_get_intr_status_in_isr(TIMER_GROUP_0);
+    uint64_t timer_counter_value = timer_group_get_counter_value_in_isr(TIMER_GROUP_0, timer_idx);
+
+    timer_event_t evt;
+    evt.timer_group = 0;
+    evt.timer_idx = timer_idx;
+    evt.timer_counter_value = timer_counter_value;
+
+    timer_group_clr_intr_status_in_isr(TIMER_GROUP_0, timer_idx);
+    timer_group_enable_alarm_in_isr(TIMER_GROUP_0, timer_idx);
+
+    xQueueOverwriteFromISR(timer_queue, &evt, NULL);
+    timer_spinlock_give(TIMER_GROUP_0);
+}
+
+
+void timer_example_evt_task(void *arg)
+{
+    // uint32_t angle;
+
+    uint64_t start = 0;
+    uint64_t stop = 0;
+    while (1) {
+        timer_event_t evt;
+        xQueueReceive(timer_queue, &evt, portMAX_DELAY);
+
+        uint64_t t1 = stop = esp_timer_get_time();
+
+        if(param_g.start == 0 && param_g.start_flag) {
+            continue;
+        }
+
+        if(param_g.note_length > 0 && stop - param_g.start >= param_g.note_length) {
+            param_g.start = 0;
+            param_g.start_flag = false;
+            mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 0);
+            continue;
+        }
+
+        if(param_g.note_on_off == true) {
+            float Y = param_g.playing_algorism(&param_g.param1, &param_g.param2, &param_g.param3, &param_g.param4);
+            // angle = MAX_PULSEWIDTH * Y; //herz_to_duty(Y)をコールしたいが最適化のため直接書く
+            mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, MAX_PULSEWIDTH * Y);
+        }
+
+        // uint64_t t2 = esp_timer_get_time();
+        // printf("time = %lld\n", t2 - t1);
+    }
+}
+
+
+void fm_algorism_timer_init()
+{
+    memset(&param_g, 0 , sizeof(struct note_param));
+
+    timer_queue = xQueueCreate(1, sizeof(timer_event_t));
+    xTaskCreate(timer_example_evt_task, "timer_evt_task", 2048, NULL, 5, NULL);
+
+    int timer_idx = TIMER_0;
+
+    timer_config_t config;
+    config.divider = 80;
+    config.counter_dir = TIMER_COUNT_UP;
+    config.counter_en = TIMER_PAUSE;
+    config.alarm_en = TIMER_ALARM_EN;
+    config.intr_type = TIMER_INTR_LEVEL;
+    config.auto_reload = 1;
+#ifdef TIMER_GROUP_SUPPORTS_XTAL_CLOCK
+    config.clk_src = TIMER_SRC_CLK_APB;
+#endif
+    timer_init(TIMER_GROUP_0, 0, &config);
+
+    timer_init(TIMER_GROUP_0, 0, &config);
+
+    /* Timer's counter will initially start from value below.
+       Also, if auto_reload is set, this value will be automatically reload on alarm */
+    timer_set_counter_value(TIMER_GROUP_0, 0, 0x00000000ULL);
+
+    /* Configure the alarm value and the interrupt on alarm. */
+    timer_set_alarm_value(TIMER_GROUP_0, 0, 20);
+    timer_enable_intr(TIMER_GROUP_0, 0);
+    timer_isr_register(TIMER_GROUP_0, 0, timer_group0_isr,
+        (void *) timer_idx, ESP_INTR_FLAG_IRAM, NULL);
+
+    timer_start(TIMER_GROUP_0, timer_idx);
+}
+
+
+
 
 
 
@@ -57,6 +181,33 @@ void mcpwm_example_servo_control(algorism algor, bool noteOn, uint32_t helz, uin
             // dac_output_voltage(DAC_CHANNEL_1, 255 * Y);
         }
     }
+}
+
+
+void mcpwm_example_servo_control_4op2(algolism_4op algor, bool noteOn, uint64_t time, struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4)
+{
+    while(1){
+        if(param_g.start != 0 && param_g.start_flag == true) {
+            vTaskDelay(1);
+        }
+        else {
+            break;
+        }
+    }
+
+
+    param_g.playing_algorism = algor;
+    param_g.note_on_off = noteOn;
+    param_g.note_length = time;
+
+    memcpy(&param_g.param1, param1, sizeof(struct algorism_param_4op));
+    memcpy(&param_g.param2, param2, sizeof(struct algorism_param_4op));
+    memcpy(&param_g.param3, param3, sizeof(struct algorism_param_4op));
+    memcpy(&param_g.param4, param4, sizeof(struct algorism_param_4op));
+
+    param_g.start = esp_timer_get_time();
+    param_g.start_flag = true;
+
 }
 
 

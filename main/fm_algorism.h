@@ -6,6 +6,9 @@
 #include "freertos/queue.h"
 #include "esp_attr.h"
 
+#include "driver/periph_ctrl.h"
+#include "driver/timer.h"
+
 #include "driver/mcpwm.h"
 #include "driver/uart.h"
 #include "driver/gpio.h"
@@ -61,3 +64,4 @@ uint32_t herz_to_duty(float Y);
 void mcpwm_sound_soure_init();
 void mcpwm_example_servo_control(algorism algor, bool noteOn, uint32_t helz, uint64_t time);
 void mcpwm_example_servo_control_4op(algolism_4op algor, bool noteOn, uint64_t time, struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4);
+void mcpwm_example_servo_control_4op2(algolism_4op algor, bool noteOn, uint64_t time, struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4);

@@ -9,6 +9,51 @@
 #define eighth_note 250000
 
 
+struct note_param {
+    algolism_4op playing_algorism;
+    struct algorism_param_4op param1, param2, param3, param4;
+
+    bool        note_on_off;
+    uint16_t    tempo;
+    uint64_t    note_length;
+
+    bool        is_current;
+    struct note_param* prev;
+    struct note_param* next;
+};
+
+
+
+
+
+// volatile struct note_param*  playing_queue       = NULL;
+// volatile struct note_param*  now_playing         = NULL;
+//
+// void prepare_note(note_param* param){
+//     param->next = NULL;
+//     if(playing_queue == NULL) {
+//         param->prev = NULL;
+//         playing_queue = param;
+//     }
+//     else {
+//         note_param q = playing_queue;
+//         do {
+//             q = q->next;
+//         } while( q->next == NULL);
+//         param->prev = q;
+//         q->next = param;
+//     }
+// }
+
+
+void note_4algorism2(algolism_4op algorism, bool note_on, uint16_t tempo, uint64_t note, struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4)
+{
+    uint64_t note_length = note * tempo / defaultTempo;
+
+    mcpwm_example_servo_control_4op2(algorism, note_on, note_length, param1, param2, param3, param4);
+}
+
+
 void note_4algorism(algolism_4op algorism, bool note_on, uint16_t tempo, uint64_t note, struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4)
 {
     uint64_t note_length = note * tempo / defaultTempo;
@@ -32,8 +77,7 @@ void note(algorism algor, bool note_on, uint16_t helz, uint16_t tempo, uint64_t 
 void clear_param(struct algorism_param_4op *param1){
 
     param1->internal.atack_start_time = param1->internal.decay_start_time = param1->internal.release_start_time = 0;
-    param1->attack = 0; param1->decay = 1500000; param1->sustain_level = 0.1;
-    param1->amp = 1.0;
+    param1->attack = 300; param1->decay = 1000000; param1->sustain_level = 0.0;
 
 }
 
@@ -68,75 +112,130 @@ void onkai(void* arg)
         algorism_[6] = YM2203_algolism6;
         algorism_[7] = YM2203_algolism7;
 
+        // param1.helz = param2.helz = param3.helz = param4.helz = 392;
+        // clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
+        // note_4algorism2(YM2203_algolism7, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
+        // vTaskDelay(100);
+
+
         for (int i = 0 ; i < 8 ; ++i) {
             algolism_4op algorism = algorism_[i];
 
 
             param1.helz = param2.helz = param3.helz = param4.helz = 392;
             clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
-            note_4algorism(algorism, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
+            note_4algorism2(algorism, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
             param1.helz = param2.helz = param3.helz = param4.helz = 330;
             clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
-            note_4algorism(algorism, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
+            note_4algorism2(algorism, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
             clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
-            note_4algorism(algorism, true, defaultTempo, half_note,     &param1, &param2, &param3, &param4);
+            note_4algorism2(algorism, true, defaultTempo, half_note,     &param1, &param2, &param3, &param4);
 
             param1.helz = param2.helz = param3.helz = param4.helz = 349;
             clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
-            note_4algorism(algorism, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
+            note_4algorism2(algorism, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
             param1.helz = param2.helz = param3.helz = param4.helz = 294;
             clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
-            note_4algorism(algorism, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
+            note_4algorism2(algorism, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
             clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
-            note_4algorism(algorism, true, defaultTempo, half_note,     &param1, &param2, &param3, &param4);
+            note_4algorism2(algorism, true, defaultTempo, half_note,     &param1, &param2, &param3, &param4);
 
             param1.helz = param2.helz = param3.helz = param4.helz = 262;
             clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
-            note_4algorism(algorism, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
+            note_4algorism2(algorism, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
             param1.helz = param2.helz = param3.helz = param4.helz = 294;
             clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
-            note_4algorism(algorism, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
+            note_4algorism2(algorism, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
             param1.helz = param2.helz = param3.helz = param4.helz = 330;
             clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
-            note_4algorism(algorism, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
+            note_4algorism2(algorism, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
             param1.helz = param2.helz = param3.helz = param4.helz = 349;
             clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
-            note_4algorism(algorism, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
+            note_4algorism2(algorism, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
 
             param1.helz = param2.helz = param3.helz = param4.helz = 392;
             clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
-            note_4algorism(algorism, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
+            note_4algorism2(algorism, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
             clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
-            note_4algorism(algorism, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
+            note_4algorism2(algorism, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
             clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
-            note_4algorism(algorism, true, defaultTempo, half_note,     &param1, &param2, &param3, &param4);
+            note_4algorism2(algorism, true, defaultTempo, half_note,     &param1, &param2, &param3, &param4);
 
-            clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
-            note_4algorism(algorism, false, defaultTempo, quoater_note, &param1, &param2, &param3, &param4);
         }
 
-        note(calc_sin_value, true, 392, defaultTempo, quoater_note);
-        note(calc_sin_value, true, 330, defaultTempo, quoater_note);
-        note(calc_sin_value, true, 330, defaultTempo, half_note);
-        note(calc_sin_value, false, 330, defaultTempo, half_note);
 
-        note(calc_sin_value, true, 349, defaultTempo, quoater_note);
-        note(calc_sin_value, true, 294, defaultTempo, quoater_note);
-        note(calc_sin_value, true, 294, defaultTempo, half_note);
-        note(calc_sin_value, false, 330, defaultTempo, half_note);
+        param1.amp = 0.0;
+        param2.amp = 0.0;
+        param3.amp = 0.0;
+        param4.amp = 1.0;
 
-        note(calc_sin_value, true, 262, defaultTempo, quoater_note);
-        note(calc_sin_value, true, 294, defaultTempo, quoater_note);
-        note(calc_sin_value, true, 330, defaultTempo, quoater_note);
-        note(calc_sin_value, true, 349, defaultTempo, quoater_note);
-        note(calc_sin_value, true, 392, defaultTempo, quoater_note);
+        param4.helz_mul = 1;
 
-        note(calc_sin_value, true, 392, defaultTempo, quoater_note);
 
-        note(calc_sin_value, true, 392, defaultTempo, half_note);
-        note(calc_sin_value, false, 392, defaultTempo, half_note);
+        param1.helz = param2.helz = param3.helz = param4.helz = 392;
+        clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
+        note_4algorism2(YM2203_algolism7, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
+        param1.helz = param2.helz = param3.helz = param4.helz = 330;
+        clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
+        note_4algorism2(YM2203_algolism7, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
+        clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
+        note_4algorism2(YM2203_algolism7, true, defaultTempo, half_note,     &param1, &param2, &param3, &param4);
 
-        vTaskDelay(100);
+        param1.helz = param2.helz = param3.helz = param4.helz = 349;
+        clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
+        note_4algorism2(YM2203_algolism7, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
+        param1.helz = param2.helz = param3.helz = param4.helz = 294;
+        clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
+        note_4algorism2(YM2203_algolism7, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
+        clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
+        note_4algorism2(YM2203_algolism7, true, defaultTempo, half_note,     &param1, &param2, &param3, &param4);
+
+        param1.helz = param2.helz = param3.helz = param4.helz = 262;
+        clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
+        note_4algorism2(YM2203_algolism7, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
+        param1.helz = param2.helz = param3.helz = param4.helz = 294;
+        clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
+        note_4algorism2(YM2203_algolism7, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
+        param1.helz = param2.helz = param3.helz = param4.helz = 330;
+        clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
+        note_4algorism2(YM2203_algolism7, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
+        param1.helz = param2.helz = param3.helz = param4.helz = 349;
+        clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
+        note_4algorism2(YM2203_algolism7, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
+
+        param1.helz = param2.helz = param3.helz = param4.helz = 392;
+        clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
+        note_4algorism2(YM2203_algolism7, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
+        clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
+        note_4algorism2(YM2203_algolism7, true, defaultTempo, quoater_note,  &param1, &param2, &param3, &param4);
+        clear_param(&param1); clear_param(&param2); clear_param(&param3); clear_param(&param4);
+        note_4algorism2(YM2203_algolism7, true, defaultTempo, half_note,     &param1, &param2, &param3, &param4);
+
+
+
+        //
+        // note(calc_sin_value, true, 392, defaultTempo, quoater_note);
+        // note(calc_sin_value, true, 330, defaultTempo, quoater_note);
+        // note(calc_sin_value, true, 330, defaultTempo, half_note);
+        // note(calc_sin_value, false, 330, defaultTempo, half_note);
+        //
+        // note(calc_sin_value, true, 349, defaultTempo, quoater_note);
+        // note(calc_sin_value, true, 294, defaultTempo, quoater_note);
+        // note(calc_sin_value, true, 294, defaultTempo, half_note);
+        // note(calc_sin_value, false, 330, defaultTempo, half_note);
+        //
+        // note(calc_sin_value, true, 262, defaultTempo, quoater_note);
+        // note(calc_sin_value, true, 294, defaultTempo, quoater_note);
+        // note(calc_sin_value, true, 330, defaultTempo, quoater_note);
+        // note(calc_sin_value, true, 349, defaultTempo, quoater_note);
+        // note(calc_sin_value, true, 392, defaultTempo, quoater_note);
+        //
+        // note(calc_sin_value, true, 392, defaultTempo, quoater_note);
+        //
+        // note(calc_sin_value, true, 392, defaultTempo, half_note);
+        // note(calc_sin_value, false, 392, defaultTempo, half_note);
+        //
+        // vTaskDelay(100);
     }
 }
 
