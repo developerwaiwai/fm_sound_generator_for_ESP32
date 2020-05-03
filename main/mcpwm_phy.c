@@ -195,6 +195,10 @@ void mcpwm_example_servo_control_4op2(algolism_4op algor, bool noteOn, uint64_t 
         }
     }
 
+    param1->muled_helz = param1->helz_mul * param1->helz;
+    param2->muled_helz = param2->helz_mul * param2->helz;
+    param3->muled_helz = param3->helz_mul * param3->helz;
+    param4->muled_helz = param4->helz_mul * param4->helz;
 
     param_g.playing_algorism = algor;
     param_g.note_on_off = noteOn;

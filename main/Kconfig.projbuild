@@ -1,0 +1,29 @@
+menu "FM sound generator Configuration"
+
+    menu "I2C Slave"
+        config I2C_SLAVE_SCL
+            int "SCL GPIO Num"
+            default 5
+            help
+                GPIO number for I2C Slave clock line.
+
+        config I2C_SLAVE_SDA
+            int "SDA GPIO Num"
+            default 4
+            help
+                GPIO number for I2C Slave data line.
+
+        config I2C_SLAVE_PORT_NUM
+            int "Port Number"
+            default 0
+            help
+                Port number for I2C Slave device.
+
+        config I2C_SLAVE_ADDRESS
+            hex "ESP Slave Address"
+            default 0x20
+            help
+                Hardware Address of I2C Slave Port.
+    endmenu
+
+endmenu

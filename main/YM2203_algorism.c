@@ -44,10 +44,15 @@ float YM2203_algolism0(struct algorism_param_4op *param1, struct algorism_param_
 {
     uint64_t t = esp_timer_get_time();
 
-    uint32_t helz1 = param1->helz_mul * param1->helz;
-    uint32_t helz2 = param2->helz_mul * param2->helz;
-    uint32_t helz3 = param3->helz_mul * param3->helz;
-    uint32_t helz4 = param4->helz_mul * param4->helz;
+    // uint32_t helz1 = param1->helz_mul * param1->helz;
+    // uint32_t helz2 = param2->helz_mul * param2->helz;
+    // uint32_t helz3 = param3->helz_mul * param3->helz;
+    // uint32_t helz4 = param4->helz_mul * param4->helz;
+
+    uint32_t helz1 = param1->muled_helz;
+    uint32_t helz2 = param2->muled_helz;
+    uint32_t helz3 = param3->muled_helz;
+    uint32_t helz4 = param4->muled_helz;
 
     float amp1 = param1->amp * envelope(param1, t);
     float amp2 = param2->amp * envelope(param2, t);
@@ -73,10 +78,10 @@ float YM2203_algolism1(struct algorism_param_4op *param1, struct algorism_param_
 {
     uint64_t t = esp_timer_get_time();
 
-    uint32_t helz1 = param1->helz_mul * param1->helz;
-    uint32_t helz2 = param2->helz_mul * param2->helz;
-    uint32_t helz3 = param3->helz_mul * param3->helz;
-    uint32_t helz4 = param4->helz_mul * param4->helz;
+    uint32_t helz1 = param1->muled_helz;
+    uint32_t helz2 = param2->muled_helz;
+    uint32_t helz3 = param3->muled_helz;
+    uint32_t helz4 = param4->muled_helz;
 
     float amp1 = param1->amp * envelope(param1, t);
     float amp2 = param2->amp * envelope(param2, t);
@@ -97,10 +102,10 @@ float YM2203_algolism2(struct algorism_param_4op *param1, struct algorism_param_
 {
     uint64_t t = esp_timer_get_time();
 
-    uint32_t helz1 = param1->helz_mul * param1->helz;
-    uint32_t helz2 = param2->helz_mul * param2->helz;
-    uint32_t helz3 = param3->helz_mul * param3->helz;
-    uint32_t helz4 = param4->helz_mul * param4->helz;
+    uint32_t helz1 = param1->muled_helz;
+    uint32_t helz2 = param2->muled_helz;
+    uint32_t helz3 = param3->muled_helz;
+    uint32_t helz4 = param4->muled_helz;
 
     float amp1 = param1->amp * envelope(param1, t);
     float amp2 = param2->amp * envelope(param2, t);
@@ -120,10 +125,10 @@ float YM2203_algolism3(struct algorism_param_4op *param1, struct algorism_param_
 {
     uint64_t t = esp_timer_get_time();
 
-    uint32_t helz1 = param1->helz_mul * param1->helz;
-    uint32_t helz2 = param2->helz_mul * param2->helz;
-    uint32_t helz3 = param3->helz_mul * param3->helz;
-    uint32_t helz4 = param4->helz_mul * param4->helz;
+    uint32_t helz1 = param1->muled_helz;
+    uint32_t helz2 = param2->muled_helz;
+    uint32_t helz3 = param3->muled_helz;
+    uint32_t helz4 = param4->muled_helz;
 
     float amp1 = param1->amp * envelope(param1, t);
     float amp2 = param2->amp * envelope(param2, t);
@@ -144,10 +149,10 @@ float YM2203_algolism4(struct algorism_param_4op *param1, struct algorism_param_
 {
     uint64_t t = esp_timer_get_time();
 
-    uint32_t helz1 = param1->helz_mul * param1->helz;
-    uint32_t helz2 = param2->helz_mul * param2->helz;
-    uint32_t helz3 = param3->helz_mul * param3->helz;
-    uint32_t helz4 = param4->helz_mul * param4->helz;
+    uint32_t helz1 = param1->muled_helz;
+    uint32_t helz2 = param2->muled_helz;
+    uint32_t helz3 = param3->muled_helz;
+    uint32_t helz4 = param4->muled_helz;
 
     float amp1 = param1->amp * envelope(param1, t);
     float amp2 = param2->amp * envelope(param2, t);
@@ -170,10 +175,10 @@ float YM2203_algolism5(struct algorism_param_4op *param1, struct algorism_param_
 {
     uint64_t t = esp_timer_get_time();
 
-    uint32_t helz1 = param1->helz_mul * param1->helz;
-    uint32_t helz2 = param2->helz_mul * param2->helz;
-    uint32_t helz3 = param3->helz_mul * param3->helz;
-    uint32_t helz4 = param4->helz_mul * param4->helz;
+    uint32_t helz1 = param1->muled_helz;
+    uint32_t helz2 = param2->muled_helz;
+    uint32_t helz3 = param3->muled_helz;
+    uint32_t helz4 = param4->muled_helz;
 
     float amp1 = param1->amp * envelope(param1, t);
     float amp2 = param2->amp * envelope(param2, t);
@@ -197,10 +202,10 @@ float YM2203_algolism6(struct algorism_param_4op *param1, struct algorism_param_
 {
     uint64_t t = esp_timer_get_time();
 
-    uint32_t helz1 = param1->helz_mul * param1->helz;
-    uint32_t helz2 = param2->helz_mul * param2->helz;
-    uint32_t helz3 = param3->helz_mul * param3->helz;
-    uint32_t helz4 = param4->helz_mul * param4->helz;
+    uint32_t helz1 = param1->muled_helz;
+    uint32_t helz2 = param2->muled_helz;
+    uint32_t helz3 = param3->muled_helz;
+    uint32_t helz4 = param4->muled_helz;
 
     float amp1 = param1->amp * envelope(param1, t);
     float amp2 = param2->amp * envelope(param2, t);
@@ -224,10 +229,10 @@ float YM2203_algolism7(struct algorism_param_4op *param1, struct algorism_param_
 {
     uint64_t t = esp_timer_get_time();
 
-    uint32_t helz1 = param1->helz_mul * param1->helz;
-    uint32_t helz2 = param2->helz_mul * param2->helz;
-    uint32_t helz3 = param3->helz_mul * param3->helz;
-    uint32_t helz4 = param4->helz_mul * param4->helz;
+    uint32_t helz1 = param1->muled_helz;
+    uint32_t helz2 = param2->muled_helz;
+    uint32_t helz3 = param3->muled_helz;
+    uint32_t helz4 = param4->muled_helz;
 
     float amp1 = param1->amp * envelope(param1, t);
     float amp2 = param2->amp * envelope(param2, t);

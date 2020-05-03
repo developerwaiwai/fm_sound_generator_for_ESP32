@@ -1,6 +1,6 @@
 #include "fm_algorism.h"
 #include "playing_command.h"
-
+#include <string.h>
 
 #define defaultTempo 120
 #define whole_note 2000000
@@ -9,18 +9,18 @@
 #define eighth_note 250000
 
 
-struct note_param {
-    algolism_4op playing_algorism;
-    struct algorism_param_4op param1, param2, param3, param4;
-
-    bool        note_on_off;
-    uint16_t    tempo;
-    uint64_t    note_length;
-
-    bool        is_current;
-    struct note_param* prev;
-    struct note_param* next;
-};
+// struct note_param {
+//     algolism_4op playing_algorism;
+//     struct algorism_param_4op param1, param2, param3, param4;
+//
+//     bool        note_on_off;
+//     uint16_t    tempo;
+//     uint64_t    note_length;
+//
+//     bool        is_current;
+//     struct note_param* prev;
+//     struct note_param* next;
+// };
 
 
 
@@ -240,51 +240,182 @@ void onkai(void* arg)
 }
 
 
-#define ECHO_TEST_TXD  (GPIO_NUM_4)
-#define ECHO_TEST_RXD  (GPIO_NUM_5)
+/*------------------------------------------------------------------------------
+*
+* ここからシリアル通信のやつ
+*
+*/
+
+#define command_param1      0x01
+#define command_param2      0x02
+#define command_param3      0x03
+#define command_param4      0x04
+
+#define command_note_on     0x10
+#define command_note_off    0x11
+
+
+#define RW_LENGTH 34               /*!< Data length for r/w test, [0,DATA_LENGTH] */
+
+struct ocirator_param_i2c {
+    uint16_t    amp100;
+    uint16_t    mul;
+    uint32_t    helz;
+
+    uint64_t    attack;
+    uint64_t    decay;
+    uint16_t    sus_level100;
+    uint16_t    release_level100;
+};
+
+struct note_param_i2c {
+    uint16_t    on_off;
+    uint16_t    algorism;
+    uint16_t    tempo;
+    uint16_t    helz;
+    uint64_t    note_type;
+    uint64_t    reserved[2];
+};
+
+#define ECHO_TEST_TXD  (GPIO_NUM_15)
+#define ECHO_TEST_RXD  (GPIO_NUM_2)
 #define ECHO_TEST_RTS  (UART_PIN_NO_CHANGE)
 #define ECHO_TEST_CTS  (UART_PIN_NO_CHANGE)
 
 #define BUF_SIZE (1024)
 
+struct ocirator_param_i2c param1,param2,param3,param4;
 
-static xQueueHandle command_queue = NULL;
+
+void make_algorism_param(struct note_param_i2c i2c_note, struct ocirator_param_i2c i2c_param, struct algorism_param_4op* alg_param) {
+    alg_param->amp = (float)((float)i2c_param.amp100 / 100.);
+    alg_param->helz_mul = i2c_param.mul;
+    alg_param->helz = i2c_note.helz;
+    alg_param->attack = i2c_param.attack;
+    alg_param->decay = i2c_param.decay;
+    alg_param->sustain_level = (float)((float)i2c_param.sus_level100 / 100.);
+    alg_param->release = (float)((float)i2c_param.release_level100 / 100.);
+    alg_param->muled_helz = alg_param->helz_mul * alg_param->helz ;
+}
+
+void music_data_receive(void* arg)
+{
+    struct algorism_param_4op alg_param1, alg_param2, alg_param3, alg_param4;
+    struct note_param_i2c note_i2c;
+
+    uint8_t *data = (uint8_t *) malloc(BUF_SIZE);
+    while(1) {
+        int len = uart_read_bytes(UART_NUM_1, data, RW_LENGTH, portMAX_DELAY);
+
+        switch(data[0]) {
+            case command_param1:
+                printf("Received1\n");
+                memcpy(&param1, &data[2], sizeof(struct ocirator_param_i2c));
+                printf("\n");
+                printf("%d, ", param1.amp100);
+                printf("%d, ", param1.mul);
+                printf("%d, ", param1.helz);
+                printf("%lld, ", param1.attack);
+                printf("%lld, ", param1.decay);
+                printf("%d, ", param1.sus_level100);
+                printf("%d, ", param1.release_level100);
+                break;
+
+            case command_param2:
+                printf("Received2\n");
+                memcpy(&param2, &data[2], sizeof(struct ocirator_param_i2c));
+                break;
+
+            case command_param3:
+                printf("Received3\n");
+                memcpy(&param3, &data[2], sizeof(struct ocirator_param_i2c));
+                break;
+
+            case command_param4:
+                printf("Received4\n");
+                memcpy(&param4, &data[2], sizeof(struct ocirator_param_i2c));
+                break;
+
+            case command_note_on:
+            case command_note_off:
+                printf("Received16\n");
+                memcpy(&note_i2c, &data[2], sizeof(struct note_param_i2c));
+                printf("\n");
+                printf("%d, ", note_i2c.on_off);
+                printf("%d, ", note_i2c.algorism);
+                printf("%d, ", note_i2c.tempo);
+                printf("%d, ", note_i2c.helz);
+                printf("%lld, ", note_i2c.note_type);
+
+                make_algorism_param(note_i2c, param1, &alg_param1);
+                make_algorism_param(note_i2c, param2, &alg_param2);
+                make_algorism_param(note_i2c, param3, &alg_param3);
+                make_algorism_param(note_i2c, param4, &alg_param4);
+
+                algolism_4op algorism;
+                switch(note_i2c.algorism) {
+                    case 0:
+                        algorism = YM2203_algolism0;
+                        break;
+                    case 1:
+                        algorism = YM2203_algolism1;
+                        break;
+                    case 2:
+                        algorism = YM2203_algolism2;
+                        break;
+                    case 3:
+                        algorism = YM2203_algolism3;
+                        break;
+                    case 4:
+                        algorism = YM2203_algolism4;
+                        break;
+                    case 5:
+                        algorism = YM2203_algolism5;
+                        break;
+                    case 6:
+                        algorism = YM2203_algolism6;
+                        break;
+                    case 7:
+                        algorism = YM2203_algolism7;
+                        break;
+                    default:
+                        algorism = YM2203_algolism0;
+                        break;
+                }
+                // onkai(NULL);
+
+                note_4algorism2(algorism, note_i2c.on_off, note_i2c.tempo, note_i2c.note_type, &alg_param1, &alg_param2, &alg_param3, &alg_param4);
+                break;
+        }
+    }
+}
 
 
-// void music_data_receive(void* arg)
-// {
-//     uint8_t *data = (uint8_t *) malloc(BUF_SIZE);
-//     while(1) {
-//         int len = uart_read_bytes(UART_NUM_1, data, sizeof(struct packet), 20 / portTICK_RATE_MS);
-//
-//         struct packet *p = data;
-//         print("received command = %d", p->command);
-//
-//         xQueueSend(command_queue, p, 0);
-//     }
-// }
+
 
 void app_main(void)
 {
 
     mcpwm_sound_soure_init();
-    xTaskCreate(onkai, "onkai", 4096, NULL, 5, NULL);
+    // xTaskCreate(onkai, "onkai", 4096, NULL, 5, NULL);
 
-    // command_queue = xQueueCreate(10, sizeof(struct packet));
-    //
-    // uart_config_t uart_config = {
-    //     .baud_rate = 115200,
-    //     .data_bits = UART_DATA_8_BITS,
-    //     .parity    = UART_PARITY_DISABLE,
-    //     .stop_bits = UART_STOP_BITS_1,
-    //     .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
-    //     .source_clk = UART_SCLK_APB,
-    // };
-    // uart_driver_install(UART_NUM_1, BUF_SIZE * 2, 0, 0, NULL, 0);
-    // uart_param_config(UART_NUM_1, &uart_config);
-    // uart_set_pin(UART_NUM_1, ECHO_TEST_TXD, ECHO_TEST_RXD, ECHO_TEST_RTS, ECHO_TEST_CTS);
-    //
-    // xTaskCreatePinnedToCore(echo_task, "music_data_receive", 1024, NULL, 10, NULL, 0);
+    // spi_initialize();
+    // xTaskCreatePinnedToCore(spi_receive_task, "spi_receive_task", 4096, NULL, 5, NULL, 1);
+
+
+    uart_config_t uart_config = {
+        .baud_rate = 115200,
+        .data_bits = UART_DATA_8_BITS,
+        .parity    = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+        .source_clk = UART_SCLK_APB,
+    };
+    uart_driver_install(UART_NUM_1, BUF_SIZE * 2, 0, 0, NULL, 0);
+    uart_param_config(UART_NUM_1, &uart_config);
+    uart_set_pin(UART_NUM_1, ECHO_TEST_TXD, ECHO_TEST_RXD, ECHO_TEST_RTS, ECHO_TEST_CTS);
+
+    xTaskCreate(music_data_receive, "music_data_receive", 4096, NULL, 10, NULL);
 
     printf("end");
 }

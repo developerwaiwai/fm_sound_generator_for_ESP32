@@ -31,6 +31,7 @@ struct algorism_param_4op {
     float       amp;
     uint32_t    helz_mul;
     uint32_t    helz;
+    uint32_t    muled_helz;
 
     uint64_t    attack;
     uint64_t    decay;
@@ -65,3 +66,6 @@ void mcpwm_sound_soure_init();
 void mcpwm_example_servo_control(algorism algor, bool noteOn, uint32_t helz, uint64_t time);
 void mcpwm_example_servo_control_4op(algolism_4op algor, bool noteOn, uint64_t time, struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4);
 void mcpwm_example_servo_control_4op2(algolism_4op algor, bool noteOn, uint64_t time, struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4);
+
+
+void note_4algorism2(algolism_4op algorism, bool note_on, uint16_t tempo, uint64_t note, struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4);
