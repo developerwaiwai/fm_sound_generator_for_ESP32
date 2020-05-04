@@ -48,7 +48,11 @@
 
 void note_4algorism2(algolism_4op algorism, bool note_on, uint16_t tempo, uint64_t note, struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4)
 {
-    uint64_t note_length = note * tempo / defaultTempo;
+    uint64_t note_length = note *  defaultTempo / tempo;
+    param1->internal.atack_start_time = param1->internal.decay_start_time = param1->internal.release_start_time = 0;
+    param2->internal.atack_start_time = param2->internal.decay_start_time = param2->internal.release_start_time = 0;
+    param3->internal.atack_start_time = param3->internal.decay_start_time = param3->internal.release_start_time = 0;
+    param4->internal.atack_start_time = param4->internal.decay_start_time = param4->internal.release_start_time = 0;
 
     mcpwm_example_servo_control_4op2(algorism, note_on, note_length, param1, param2, param3, param4);
 }
@@ -300,52 +304,68 @@ void make_algorism_param(struct note_param_i2c i2c_note, struct ocirator_param_i
 
 void music_data_receive(void* arg)
 {
+    char ACK = 1;
+    char NACK = 0;
+
     struct algorism_param_4op alg_param1, alg_param2, alg_param3, alg_param4;
     struct note_param_i2c note_i2c;
 
     uint8_t *data = (uint8_t *) malloc(BUF_SIZE);
     while(1) {
-        int len = uart_read_bytes(UART_NUM_1, data, RW_LENGTH, portMAX_DELAY);
+        // onkai(NULL);
+        int len = uart_read_bytes(UART_NUM_1, data, RW_LENGTH, 1000);
+
+        if(len <= 0) continue;
 
         switch(data[0]) {
             case command_param1:
-                printf("Received1\n");
+                // printf("\n");
+                // printf("Received1, ");
                 memcpy(&param1, &data[2], sizeof(struct ocirator_param_i2c));
-                printf("\n");
-                printf("%d, ", param1.amp100);
-                printf("%d, ", param1.mul);
-                printf("%d, ", param1.helz);
-                printf("%lld, ", param1.attack);
-                printf("%lld, ", param1.decay);
-                printf("%d, ", param1.sus_level100);
-                printf("%d, ", param1.release_level100);
+                // printf("%d, ", param1.amp100);
+                // printf("%d, ", param1.mul);
+                // printf("%d, ", param1.helz);
+                // printf("%lld, ", param1.attack);
+                // printf("%lld, ", param1.decay);
+                // printf("%d, ", param1.sus_level100);
+                // printf("%d, ", param1.release_level100);
+
+                uart_write_bytes(UART_NUM_1, &ACK, 1);
                 break;
 
             case command_param2:
-                printf("Received2\n");
+                // printf("\n");
+                // printf("Received2");
                 memcpy(&param2, &data[2], sizeof(struct ocirator_param_i2c));
+                uart_write_bytes(UART_NUM_1, &ACK, 1);
                 break;
 
             case command_param3:
-                printf("Received3\n");
+                // printf("\n");
+                // printf("Received3");
                 memcpy(&param3, &data[2], sizeof(struct ocirator_param_i2c));
+                uart_write_bytes(UART_NUM_1, &ACK, 1);
                 break;
 
             case command_param4:
-                printf("Received4\n");
+                // printf("\n");
+                // printf("Received4");
                 memcpy(&param4, &data[2], sizeof(struct ocirator_param_i2c));
+                uart_write_bytes(UART_NUM_1, &ACK, 1);
                 break;
 
             case command_note_on:
             case command_note_off:
-                printf("Received16\n");
+                // printf("\n");
+                // printf("Received16, ");
                 memcpy(&note_i2c, &data[2], sizeof(struct note_param_i2c));
-                printf("\n");
-                printf("%d, ", note_i2c.on_off);
-                printf("%d, ", note_i2c.algorism);
-                printf("%d, ", note_i2c.tempo);
-                printf("%d, ", note_i2c.helz);
-                printf("%lld, ", note_i2c.note_type);
+                // printf("\n");
+                // printf("%d, ", note_i2c.on_off);
+                // printf("%d, ", note_i2c.algorism);
+                // printf("%d, ", note_i2c.tempo);
+                // printf("%d, ", note_i2c.helz);
+                // printf("%lld, ", note_i2c.note_type);
+                // printf("\n");
 
                 make_algorism_param(note_i2c, param1, &alg_param1);
                 make_algorism_param(note_i2c, param2, &alg_param2);
@@ -382,9 +402,9 @@ void music_data_receive(void* arg)
                         algorism = YM2203_algolism0;
                         break;
                 }
-                // onkai(NULL);
 
                 note_4algorism2(algorism, note_i2c.on_off, note_i2c.tempo, note_i2c.note_type, &alg_param1, &alg_param2, &alg_param3, &alg_param4);
+                uart_write_bytes(UART_NUM_1, &ACK, 1);
                 break;
         }
     }
@@ -415,7 +435,7 @@ void app_main(void)
     uart_param_config(UART_NUM_1, &uart_config);
     uart_set_pin(UART_NUM_1, ECHO_TEST_TXD, ECHO_TEST_RXD, ECHO_TEST_RTS, ECHO_TEST_CTS);
 
-    xTaskCreate(music_data_receive, "music_data_receive", 4096, NULL, 10, NULL);
+    xTaskCreatePinnedToCore(music_data_receive, "music_data_receive", 4096, NULL, 10, NULL, 0);
 
     printf("end");
 }

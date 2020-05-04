@@ -87,7 +87,7 @@ void timer_example_evt_task(void *arg)
         if(param_g.note_length > 0 && stop - param_g.start >= param_g.note_length) {
             param_g.start = 0;
             param_g.start_flag = false;
-            mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 0);
+            // mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 0);
             continue;
         }
 
