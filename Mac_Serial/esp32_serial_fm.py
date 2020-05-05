@@ -6,6 +6,7 @@ from multiprocessing import Process, connection, current_process
 import csv
 from oto_data import *
 
+from time import sleep
 
 def make_serial_data_param(command, amp100, mul, attack, decay, sus_level100, release_level100):
     return pack("H", command) + pack("H", amp100) + pack("H", mul) + pack("I", 0) + pack("Q", attack) + pack("Q", decay) + pack("H", sus_level100) + pack("H", release_level100) + pack("I", 0)
@@ -78,8 +79,11 @@ for row in data:
 for p in pool:
     p.start()
 
+sleep(1.0)
+
 for p in pool:
     p.join()
+
 
 f.close()
 
