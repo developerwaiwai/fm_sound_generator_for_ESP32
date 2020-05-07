@@ -40,9 +40,9 @@ float envelope(struct algorism_param_4op *param1, uint64_t t){
 }
 
 
-float YM2203_algolism0(struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4)
+float YM2203_algolism0(struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4, uint64_t t)
 {
-    uint64_t t = esp_timer_get_time();
+    // uint64_t t = esp_timer_get_time();
 
     // uint32_t helz1 = param1->helz_mul * param1->helz;
     // uint32_t helz2 = param2->helz_mul * param2->helz;
@@ -74,9 +74,9 @@ float YM2203_algolism0(struct algorism_param_4op *param1, struct algorism_param_
 }
 
 
-float YM2203_algolism1(struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4)
+float YM2203_algolism1(struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4, uint64_t t)
 {
-    uint64_t t = esp_timer_get_time();
+    // uint64_t t = esp_timer_get_time();
 
     uint32_t helz1 = param1->muled_helz;
     uint32_t helz2 = param2->muled_helz;
@@ -98,9 +98,9 @@ float YM2203_algolism1(struct algorism_param_4op *param1, struct algorism_param_
 }
 
 
-float YM2203_algolism2(struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4)
+float YM2203_algolism2(struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4, uint64_t t)
 {
-    uint64_t t = esp_timer_get_time();
+    // uint64_t t = esp_timer_get_time();
 
     uint32_t helz1 = param1->muled_helz;
     uint32_t helz2 = param2->muled_helz;
@@ -121,9 +121,9 @@ float YM2203_algolism2(struct algorism_param_4op *param1, struct algorism_param_
 }
 
 
-float YM2203_algolism3(struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4)
+float YM2203_algolism3(struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4, uint64_t t)
 {
-    uint64_t t = esp_timer_get_time();
+    // uint64_t t = esp_timer_get_time();
 
     uint32_t helz1 = param1->muled_helz;
     uint32_t helz2 = param2->muled_helz;
@@ -145,9 +145,9 @@ float YM2203_algolism3(struct algorism_param_4op *param1, struct algorism_param_
 }
 
 
-float YM2203_algolism4(struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4)
+float YM2203_algolism4(struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4, uint64_t t)
 {
-    uint64_t t = esp_timer_get_time();
+    // uint64_t t = esp_timer_get_time();
 
     uint32_t helz1 = param1->muled_helz;
     uint32_t helz2 = param2->muled_helz;
@@ -171,9 +171,9 @@ float YM2203_algolism4(struct algorism_param_4op *param1, struct algorism_param_
 }
 
 
-float YM2203_algolism5(struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4)
+float YM2203_algolism5(struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4, uint64_t t)
 {
-    uint64_t t = esp_timer_get_time();
+    // uint64_t t = esp_timer_get_time();
 
     uint32_t helz1 = param1->muled_helz;
     uint32_t helz2 = param2->muled_helz;
@@ -198,9 +198,9 @@ float YM2203_algolism5(struct algorism_param_4op *param1, struct algorism_param_
 }
 
 
-float YM2203_algolism6(struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4)
+float YM2203_algolism6(struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4, uint64_t t)
 {
-    uint64_t t = esp_timer_get_time();
+    // uint64_t t = esp_timer_get_time();
 
     uint32_t helz1 = param1->muled_helz;
     uint32_t helz2 = param2->muled_helz;
@@ -225,9 +225,9 @@ float YM2203_algolism6(struct algorism_param_4op *param1, struct algorism_param_
 }
 
 
-float YM2203_algolism7(struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4)
+float YM2203_algolism7(struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4, uint64_t t)
 {
-    uint64_t t = esp_timer_get_time();
+    // uint64_t t = esp_timer_get_time();
 
     uint32_t helz1 = param1->muled_helz;
     uint32_t helz2 = param2->muled_helz;

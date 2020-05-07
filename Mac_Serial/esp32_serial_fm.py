@@ -45,8 +45,17 @@ def read_and_send_note(serial, file_name):
     d = csv.DictReader(f)
     for row in d:
         if row["on_off"] is "":
-            break;
-        send_note(serial, int(row["on_off"]), int(row["algorism"]), int(row["tempo"]), int(ONKAI[row["helz"]]), int(ONPU[row["length"]]))
+            continue;
+        length_data = row["length"]
+        length_data.upper()
+        len_int = 0;
+        if '&' in length_data:
+            for l in length_data.split('&'):
+                len_int += int(ONPU[l])
+        else:
+            len_int = int(ONPU[length_data])
+
+        send_note(serial, int(row["on_off"]), int(row["algorism"]), int(row["tempo"]), int(ONKAI[row["helz"]]), len_int)
     f.close()
 
 

@@ -1,5 +1,9 @@
 #include "fm_algorism.h"
 #include <string.h>
+#include "esp32/rom/ets_sys.h"
+
+#define NOP() asm volatile ("nop")
+
 
 struct note_param {
     algolism_4op playing_algorism;
@@ -53,12 +57,12 @@ void IRAM_ATTR timer_group0_isr(void *para)
     int timer_idx = (int) para;
 
     uint32_t timer_intr = timer_group_get_intr_status_in_isr(TIMER_GROUP_0);
-    uint64_t timer_counter_value = timer_group_get_counter_value_in_isr(TIMER_GROUP_0, timer_idx);
+    // uint64_t timer_counter_value = timer_group_get_counter_value_in_isr(TIMER_GROUP_0, timer_idx);
 
     timer_event_t evt;
     evt.timer_group = 0;
     evt.timer_idx = timer_idx;
-    evt.timer_counter_value = timer_counter_value;
+    evt.timer_counter_value = esp_timer_get_time();
 
     timer_group_clr_intr_status_in_isr(TIMER_GROUP_0, timer_idx);
     timer_group_enable_alarm_in_isr(TIMER_GROUP_0, timer_idx);
@@ -68,7 +72,7 @@ void IRAM_ATTR timer_group0_isr(void *para)
 }
 
 
-void timer_example_evt_task(void *arg)
+void IRAM_ATTR timer_example_evt_task(void *arg)
 {
     // uint32_t angle;
 
@@ -78,9 +82,10 @@ void timer_example_evt_task(void *arg)
         timer_event_t evt;
         xQueueReceive(timer_queue, &evt, portMAX_DELAY);
 
-        uint64_t t1 = stop = esp_timer_get_time();
+        // uint64_t t1 = stop = esp_timer_get_time();
+        uint64_t t1 = stop = evt.timer_counter_value;
 
-        if(param_g.start == 0 && param_g.start_flag) {
+        if(param_g.start == 0 && param_g.start_flag == false) {
             continue;
         }
 
@@ -91,12 +96,14 @@ void timer_example_evt_task(void *arg)
             continue;
         }
 
+        float Y = param_g.playing_algorism(&param_g.param1, &param_g.param2, &param_g.param3, &param_g.param4, t1);
         if(param_g.note_on_off == true) {
-            float Y = param_g.playing_algorism(&param_g.param1, &param_g.param2, &param_g.param3, &param_g.param4);
             // angle = MAX_PULSEWIDTH * Y; //herz_to_duty(Y)をコールしたいが最適化のため直接書く
             mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, MAX_PULSEWIDTH * Y);
         }
-
+        else {
+            mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 0);
+        }
         // uint64_t t2 = esp_timer_get_time();
         // printf("time = %lld\n", t2 - t1);
     }
@@ -106,6 +113,23 @@ void timer_example_evt_task(void *arg)
 void fm_algorism_timer_init()
 {
     memset(&param_g, 0 , sizeof(struct note_param));
+    param_g.param1.amp = 1.;
+    param_g.param1.helz_mul = 1;
+    param_g.param1.helz = 440;
+    param_g.param1.muled_helz = 440;
+    param_g.param1.attack = 0;
+    param_g.param1.decay = 0;
+    param_g.param1.sustain_level = 1.;
+    param_g.param1.release = 0.;
+    memcpy (&(param_g.param2), &(param_g.param1), sizeof(struct algorism_param_4op));
+    memcpy (&(param_g.param3), &(param_g.param1), sizeof(struct algorism_param_4op));
+    memcpy (&(param_g.param4), &(param_g.param1), sizeof(struct algorism_param_4op));
+
+    param_g.playing_algorism = YM2203_algolism0;
+    param_g.note_on_off = false;
+    param_g.note_length = 0;
+    param_g.start = 0;
+    param_g.start_flag = 0;
 
     timer_queue = xQueueCreate(1, sizeof(timer_event_t));
     xTaskCreate(timer_example_evt_task, "timer_evt_task", 2048, NULL, 5, NULL);
@@ -188,6 +212,7 @@ void mcpwm_example_servo_control_4op2(algolism_4op algor, bool noteOn, uint64_t 
 {
     while(1){
         if(param_g.start != 0 && param_g.start_flag == true) {
+            // delayMicroseconds(500);
             vTaskDelay(1);
         }
         else {
@@ -246,7 +271,7 @@ void mcpwm_example_servo_control_4op(algolism_4op algor, bool noteOn, uint64_t t
         }
         else
         {
-            float Y = algor(param1, param2, param3, param4);
+            float Y = algor(param1, param2, param3, param4, start);
             angle = herz_to_duty(Y);
             mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, angle);
             // dac_output_voltage(DAC_CHANNEL_1, 255 * Y);

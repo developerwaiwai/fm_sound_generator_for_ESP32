@@ -1,2 +1,2 @@
-/dev/tty.usbserial,SoundColor.csv,Sound.csv
-/dev/tty.usbserial1,SoundColor.csv,Sound2.csv
+/dev/tty.usbserial,SlapBase.csv,opaopa_base2.csv
+/dev/tty.usbserial64,Lead.csv,opaopa_lead.csv

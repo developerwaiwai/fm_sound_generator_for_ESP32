@@ -281,8 +281,8 @@ struct note_param_i2c {
     uint64_t    reserved[2];
 };
 
-#define ECHO_TEST_TXD  (GPIO_NUM_15)
-#define ECHO_TEST_RXD  (GPIO_NUM_2)
+#define ECHO_TEST_TXD  (GPIO_NUM_16)
+#define ECHO_TEST_RXD  (GPIO_NUM_17)
 #define ECHO_TEST_RTS  (UART_PIN_NO_CHANGE)
 #define ECHO_TEST_CTS  (UART_PIN_NO_CHANGE)
 
