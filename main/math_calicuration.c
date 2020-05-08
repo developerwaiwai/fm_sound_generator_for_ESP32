@@ -165,26 +165,16 @@ float calc_sin(uint32_t helz)
 // }
 
 
+#define waru 0.000001
 // new version
 // サイン波形をテーブルから参照する
 float calc_sin_float(float helz, float mod, uint64_t now_time_in_us)
 {
-    // float T = 1000000. / helz;      // 1000 * 1000 / helz
-    // float TT = now_time_in_us / T;
-    float TT = now_time_in_us * helz / 1000000.;
-    float TT_shosu = TT - (int)TT;
+    float R = PI2 * ((now_time_in_us * helz * waru) - (int)(now_time_in_us * helz * waru));
+    R = R + mod + PI2;
 
-    float R = PI2 * TT_shosu;       // 2 * PI * TT_shosu
-    // R = R + mod;
-    // //サイン対称性により + へ移行させる
-    // if(R < 0.0) R += PI2;
-    R = R + mod + PI2;      //本当は上記、最適化のためプラスの場合も2πをたす
-
-    // float addr_f = R * SAMPLE_NUM_F / PI2; //R * 1000. / ((2 * PI));
-    // float addr_f = R * SIN_PLACE; // 本当は上記、最適化のため;
     int addr = (int)(R * SIN_PLACE);
-    // if(addr >= SAMPLE_NUM_I) addr %= SAMPLE_NUM_I;
-    addr %= SAMPLE_NUM_I;   //本当はif文が必要だけど、どっちにしろ計算しても同じ
+    addr %= SAMPLE_NUM_I;
 
     //ひとまず補正なし、最適化のため
     // float shosuAddr = addr_f - (int)addr;

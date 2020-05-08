@@ -1,2 +1,3 @@
-/dev/tty.usbserial,SlapBase.csv,opaopa_base2.csv
-/dev/tty.usbserial64,Lead.csv,opaopa_lead.csv
+/dev/tty.usbserial,SoundColor.csv,draquest_lead2.csv
+/dev/tty.usbserial130,SlapBase.csv,draquest_BASE.csv
+/dev/tty.usbserial131,Lead.csv,draquest_lead1.csv

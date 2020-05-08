@@ -46,7 +46,7 @@
 // }
 
 
-void note_4algorism2(algolism_4op algorism, bool note_on, uint16_t tempo, uint64_t note, struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4)
+bool note_4algorism2(algolism_4op algorism, bool note_on, uint16_t tempo, uint64_t note, struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4)
 {
     uint64_t note_length = note *  defaultTempo / tempo;
     param1->internal.atack_start_time = param1->internal.decay_start_time = param1->internal.release_start_time = 0;
@@ -54,7 +54,7 @@ void note_4algorism2(algolism_4op algorism, bool note_on, uint16_t tempo, uint64
     param3->internal.atack_start_time = param3->internal.decay_start_time = param3->internal.release_start_time = 0;
     param4->internal.atack_start_time = param4->internal.decay_start_time = param4->internal.release_start_time = 0;
 
-    mcpwm_example_servo_control_4op2(algorism, note_on, note_length, param1, param2, param3, param4);
+    return mcpwm_example_servo_control_4op2(algorism, note_on, note_length, param1, param2, param3, param4);
 }
 
 
@@ -403,8 +403,14 @@ void music_data_receive(void* arg)
                         break;
                 }
 
-                note_4algorism2(algorism, note_i2c.on_off, note_i2c.tempo, note_i2c.note_type, &alg_param1, &alg_param2, &alg_param3, &alg_param4);
-                uart_write_bytes(UART_NUM_1, &ACK, 1);
+                bool success = false;
+                success = note_4algorism2(algorism, note_i2c.on_off, note_i2c.tempo, note_i2c.note_type, &alg_param1, &alg_param2, &alg_param3, &alg_param4);
+                if(success == true) {
+                    uart_write_bytes(UART_NUM_1, &ACK, 1);
+                }
+                else {
+                    uart_write_bytes(UART_NUM_1, &NACK, 1);
+                }
                 break;
         }
     }

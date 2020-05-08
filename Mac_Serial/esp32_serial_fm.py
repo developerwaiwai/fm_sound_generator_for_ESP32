@@ -2,6 +2,7 @@ from ctypes import *
 import serial
 from struct import *
 from multiprocessing import Process, connection, current_process
+import time
 
 import csv
 from oto_data import *
@@ -24,9 +25,15 @@ def send_algorism_param(serial, param_num, amp100, mul, attack, decay, sus_level
 
 def send_note(serial, on_off, algorism_num, tempo, helz, notetype):
     note_data = make_serial_data_note(0x10, on_off, algorism_num, tempo, helz, notetype)
-    serial.write(note_data)
-    serial.read()    #return ACK
 
+    ack = 0
+    while ack == 0:
+        serial.write(note_data)
+        b = serial.read()    #return ACK
+        b_int = unpack("B", b)
+        ack = b_int[0]
+        # if ack == 0:
+        #     time.sleep(50/1000000.)
 
 def read_and_send_sound_param(serial, file_name):
     f = open(file_name, "r")

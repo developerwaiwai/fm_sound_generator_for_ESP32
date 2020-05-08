@@ -58,14 +58,14 @@ float YM2203_algolism7(struct algorism_param_4op *param1, struct algorism_param_
 
 
 float calc_sin(uint32_t helz);
-float calc_sin_float(float helz, float mod, uint64_t now_time_in_us);
+inline float calc_sin_float(float helz, float mod, uint64_t now_time_in_us);
 uint32_t herz_to_duty(float Y);
 
 
 void mcpwm_sound_soure_init();
 void mcpwm_example_servo_control(algorism algor, bool noteOn, uint32_t helz, uint64_t time);
 void mcpwm_example_servo_control_4op(algolism_4op algor, bool noteOn, uint64_t time, struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4);
-void mcpwm_example_servo_control_4op2(algolism_4op algor, bool noteOn, uint64_t time, struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4);
+bool mcpwm_example_servo_control_4op2(algolism_4op algor, bool noteOn, uint64_t time, struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4);
 
 
-void note_4algorism2(algolism_4op algorism, bool note_on, uint16_t tempo, uint64_t note, struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4);
+bool note_4algorism2(algolism_4op algorism, bool note_on, uint16_t tempo, uint64_t note, struct algorism_param_4op *param1, struct algorism_param_4op *param2, struct algorism_param_4op *param3, struct algorism_param_4op *param4);
