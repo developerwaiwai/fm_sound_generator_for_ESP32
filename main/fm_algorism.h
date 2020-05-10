@@ -16,9 +16,9 @@
 #include "soc/mcpwm_periph.h"
 
 
-#define FREQ           20000
+#define FREQ           16000
 #define MIN_PULSEWIDTH 0     //Minimum pulse width in microsecond
-#define MAX_PULSEWIDTH 50    //Maximum pulse width in microsecond
+#define MAX_PULSEWIDTH 62    //Maximum pulse width in microsecond
 
 
 struct internal_params {

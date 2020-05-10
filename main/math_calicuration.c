@@ -168,6 +168,7 @@ float calc_sin(uint32_t helz)
 #define waru 0.000001
 // new version
 // サイン波形をテーブルから参照する
+__attribute__((always_inline))
 float calc_sin_float(float helz, float mod, uint64_t now_time_in_us)
 {
     float R = PI2 * ((now_time_in_us * helz * waru) - (int)(now_time_in_us * helz * waru));
