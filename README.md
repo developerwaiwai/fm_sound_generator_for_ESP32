@@ -8,3 +8,10 @@ https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/
 
 Sequencer is made with Python.
 I use Mac. But maybe this sequencer can run other platform with just few modifing.
+
+
+Demo video
+
+https://youtu.be/Bl0WB1P_5t8
+https://youtu.be/fpxXeNTQtlI
+
