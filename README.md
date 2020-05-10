@@ -1,4 +1,4 @@
-# fm_sound_generator_for_ESP32
+# FM sound generator for ESP32
 
 This project is to make FM sound generator using ESP32.
 https://www.espressif.com/en/products/socs/esp32/overview
